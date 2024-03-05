@@ -72,7 +72,6 @@ public class Main {
                         //removes the path coordinates
                         int rowToTry = possiblePaths.remove(0);
                         int columnToTry = possiblePaths.remove(0);
-                        String[][] maze1 = maze;
                         maze[rowToTry][columnToTry] = "O";
                         coordinatesWentOver.add("(" + rowToTry + ", " + columnToTry + ")");
                         //RECURSION runs this function for the specific path
