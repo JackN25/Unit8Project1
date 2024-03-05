@@ -130,7 +130,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        String[][] maze = getMaze("source/big_maze");
+        String[][] maze = getMaze("source/data");
         maze[0][0] = "O";
         String[][] finishedMaze = tryPath(maze, 0, 0);
         for (String[] row : finishedMaze) {
