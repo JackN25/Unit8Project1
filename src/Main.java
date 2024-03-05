@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Main {
 
@@ -41,27 +42,30 @@ public class Main {
     public static ArrayList<String> correctCoordinates = new ArrayList<String>();
 
     public static String[][] tryPath(String[][] currentMaze, int startRow, int startColumn) {
-        String[][] maze = currentMaze;
+        String[][] maze = new String[currentMaze.length][currentMaze[0].length];
+        for (int i = 0; i < maze.length; i++) {
+            System.arraycopy(currentMaze[i], 0, maze[i], 0, maze[0].length);
+        }
         int currentRow = startRow;
         int currentColumn = startColumn;
         boolean endFound = false;
         ArrayList<String> coordinatesWentOver = new ArrayList<String>();
         while (!endFound) {
-                ArrayList<Integer> possiblePaths = getPossiblePaths(currentMaze, currentRow, currentColumn);
+                ArrayList<Integer> possiblePaths = getPossiblePaths(maze, currentRow, currentColumn);
                 //if only 1 path keep going down the path
                 if (possiblePaths.size() == 2) {
                     currentRow = possiblePaths.get(0);
                     currentColumn = possiblePaths.get(1);
                     maze[currentRow][currentColumn] = "O";
+                    coordinatesWentOver.add("(" + currentRow + ", " + currentColumn + ")");
                     //print statements for testing
                     //for (String[] row : maze) {
                         //for (String column : row) {
-                        //    System.out.print(column);
+                            //System.out.print(column);
                         //}
                         //System.out.println();
                     //}
-                    coordinatesWentOver.add("(" + currentRow + ", " + currentColumn +")");
-
+                    //System.out.println("__________________________");
                 //if more than 1 path, try all the paths(unless one already reached the end)
                 } else if (possiblePaths.size() > 2) {
                     while (!endFound && !possiblePaths.isEmpty()) {
@@ -70,12 +74,17 @@ public class Main {
                         int columnToTry = possiblePaths.remove(0);
                         String[][] maze1 = maze;
                         maze[rowToTry][columnToTry] = "O";
+                        coordinatesWentOver.add("(" + rowToTry + ", " + columnToTry + ")");
                         //RECURSION runs this function for the specific path
                         String[][] triedPath = tryPath(maze, rowToTry, columnToTry);
                         //if specific path reaches end return everything and exit recursion loops
                         if (triedPath[maze.length - 1][maze[0].length - 1].equals("O")) {
                             endFound = true;
                             maze = triedPath;
+                        }
+                        else {
+                            coordinatesWentOver.remove(coordinatesWentOver.size() - 1);
+                            maze[rowToTry][columnToTry] = "X";
                         }
                     }
                 //NOT WORKING(attempt to return maze before it checks a dead end)
@@ -84,6 +93,8 @@ public class Main {
                 }
                 //if found end return the completed maze and exit recursion loops
                 if (maze[maze.length - 1][maze[0].length - 1].equals("O")) {
+                    Collections.reverse(coordinatesWentOver);
+                    correctCoordinates.addAll(coordinatesWentOver);
                     endFound = true;
                 }
         }
@@ -117,13 +128,10 @@ public class Main {
     }
 
     //will get coordinates of correct path but not implemented because the maze also marks dead ends
-    public static int[] getCoordinatesOfCorrectPath(String[][] solvedMaze) {
-        int[] coordinates = new int[1];
-        return coordinates;
-    }
+
 
     public static void main(String[] args) {
-        String[][] maze = getMaze("source/data");
+        String[][] maze = getMaze("source/big_maze");
         maze[0][0] = "O";
         String[][] finishedMaze = tryPath(maze, 0, 0);
         for (String[] row : finishedMaze) {
@@ -132,6 +140,11 @@ public class Main {
             }
             System.out.println();
         }
-        System.out.println(correctCoordinates);
+        correctCoordinates.add("(0, 0)");
+        Collections.reverse(correctCoordinates);
+        for (int i = 0; i < correctCoordinates.size() - 1; i++) {
+            System.out.print(correctCoordinates.get(i) + " ---> ");
+        }
+        System.out.print(correctCoordinates.get(correctCoordinates.size() - 1));
     }
 }
